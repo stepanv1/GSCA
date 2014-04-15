@@ -61,7 +61,8 @@
 #'
 #' @keywords GSCA
 
-GSCAestim<-function(Z0,W0,B0,lambda_w,lambda_b){
+GSCAestim<-function(Z0,W0,B0,lambda_w = 0,lambda_b = 0){
+
   N <- nrow(Z0)
   
   Z0 <- as.matrix(Z0);W0 <- as.matrix(W0);B0 <- as.matrix(B0);
@@ -104,7 +105,25 @@ GSCAestim<-function(Z0,W0,B0,lambda_w,lambda_b){
   
   it <- 0             
   
-
+    while(imp > 0.000001){print(imp)
+      it <- it+1
+      #Step 1: Update B
+      tr_b <- 0
+        for (p in 1:P){ print(p)
+          ee <- matrix(0, 1, P)
+          ee[p] <- 1
+          LL <- diag(P)
+          LL[p, p] <- 0
+          b0 <- B0[, p]
+          bindex_p <- which(b0 == 99)
+          YY <- Gamma - Gamma%*%B%*%LL
+          if (length(bindex_p)!=0){
+            B[bindex_p, p] <- solve(t(Gamma[ , bindex_p])%*%Gamma[ , bindex_p] + lambda_b*diag(length(bindex_p)))%*%((t(Gamma[ , bindex_p])%*%YY)%*%t(ee));
+            tr_b <- tr_b + t(B[bindex_p, p])%*%B[bindex_p, p]
+          }
+        }
+      browser()
+    }
 
 }
 
