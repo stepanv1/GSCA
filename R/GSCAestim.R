@@ -61,7 +61,11 @@
 #'
 #' @keywords GSCA
 
-GSCAestim<-function(Z0,W0,B0,N,lambda_w,lambda_b){
+GSCAestim<-function(Z0,W0,B0,lambda_w,lambda_b){
+  N <- nrow(Z0)
+  
+  Z0 <- as.matrix(Z0);W0 <- as.matrix(W0);B0 <- as.matrix(B0);
+  
   J <- nrow(W0); P <- ncol(W0)
   
   JP <- J + P
@@ -94,6 +98,11 @@ GSCAestim<-function(Z0,W0,B0,N,lambda_w,lambda_b){
   sizeZ <- dim(Z)[1]
   Gamma <- Z%*%W
   Psi <- Z%*%V
+  
+  f0 <- 100000000
+  imp <- 100000000
+  
+  it <- 0             
   
 
 
