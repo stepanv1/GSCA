@@ -77,7 +77,7 @@ GSCAestim<-function(Z0,W0,B0,lambda_w = 0,lambda_b = 0){
   
   for (p in c(1:P)){
     WINDp <- which(W0[ , p] != 0)  #find the non null elements
-    print(WINDp)
+    #print(WINDp)
     if (length(WINDp) > 1){    
       W0[WINDp, p] <- 99}
     }
@@ -105,11 +105,11 @@ GSCAestim<-function(Z0,W0,B0,lambda_w = 0,lambda_b = 0){
   
   it <- 0             
   
-    while(imp > 0.000001){print(imp)
+    while(abs(imp) > 0.000001){
       it <- it+1
       #Step 1: Update B
       tr_b <- 0
-        for (p in 1:P){ print(p)
+        for (p in 1:P){ 
           ee <- matrix(0, 1, P)
           ee[p] <- 1
           LL <- diag(P)
@@ -118,13 +118,52 @@ GSCAestim<-function(Z0,W0,B0,lambda_w = 0,lambda_b = 0){
           bindex_p <- which(b0 == 99)
           YY <- Gamma - Gamma%*%B%*%LL
           if (length(bindex_p)!=0){
-            B[bindex_p, p] <- solve(t(Gamma[ , bindex_p])%*%Gamma[ , bindex_p] + lambda_b*diag(length(bindex_p)))%*%((t(Gamma[ , bindex_p])%*%YY)%*%t(ee));
+            B[bindex_p, p] <- solve(t(Gamma[ , bindex_p])%*%Gamma[ , bindex_p] + lambda_b*diag(length(bindex_p)))%*%((t(Gamma[ , bindex_p])%*%YY)%*%t(ee))
             tr_b <- tr_b + t(B[bindex_p, p])%*%B[bindex_p, p]
           }
         }
-      browser()
+      A <- cbind(C, B)
+      
+      # Step 2: Update W
+      tr_w <- 0
+      for(p in 1:P){
+        t <- J + p
+        windex_p <- which(W0[, p] == 99)
+        m <- matrix(0, 1, JP)
+        m[t] <- 1
+        a <- A[p, ]
+        beta <- m - a
+        H1 <- diag(P)
+        H2 <- diag(JP)
+        H1[p,p] <- 0
+        H2[t,t] <- 0
+        Delta <- W%*%H1%*%A - V%*%H2 
+        Zp <- Z[ , windex_p]
+        if (length(windex_p)!=0){        
+          #browser()
+          theta <- solve(as.numeric(beta%*%t(beta))*(t(Zp)%*%Zp) + lambda_w*diag(length(windex_p)))%*%(t(Zp)%*%(Z%*%Delta)%*%t(beta))
+          zw <- Zp%*%theta        
+          theta <- sqrt(N)/norm(zw)*theta
+          W[windex_p, p] <- theta
+          V[windex_p, t] <- theta
+          tr_w <- tr_w + t(theta)%*%theta
+        }
+      }
+      Gamma <- Z%*%W
+      Psi <- Z%*%V
+      dif <- Psi-Gamma%*%A                    
+      f <- sum(diag(t(dif)%*%dif)) + lambda_w*tr_w + lambda_b*tr_b                    
+      imp <- f0-f
+      f0 <- f
     }
-
+  NPAR <- nrow(WIND) + nrow(BIND)
+  Fit <- 1 - f/sum(diag(t(Psi)%*%Psi))
+  Afit <- 1 - ((1-Fit)*(N*J)/(N*J - NPAR))
+  dif_m <- Z - Gamma%*%C
+  dif_s <- Gamma - Gamma%*%B
+  Fit_m <- 1 - sum(diag(t(dif_m)%*%dif_m))/(J*N)
+  Fit_s <- 1 - sum(diag(t(dif_s)%*%dif_s))/(P*N)
+  browser()
 }
 
 
