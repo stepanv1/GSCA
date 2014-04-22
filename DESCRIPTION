@@ -1,9 +1,10 @@
 Package: GSCA
 Type: Package
-Title: What the package does (short line)
+Title: GCSA
 Version: 1.0
 Date: 2014-04-10
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
-Description: More about what it does (maybe more than one line)
-License: What license is it under?
+Author: Hela , Stepan
+Maintainer: Stepan Grinek <stepan.grinek@mail.ladydavis.ca>
+Description: A function to estimate parameters in GCSA
+License: GPL-2
+ZipData: no

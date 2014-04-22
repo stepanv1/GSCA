@@ -25,9 +25,9 @@
 #' @param lamdbda_b = ridge parameter for B  default 0
 #'
 #' @return \item{Westim}{matrix with weight coefficients estimates}
-#' @return \item{B.estim}{matrix with path coefficients estimates}
-#' @return \item{vecW.estim}{vector with the weight coefficients estimates}
-#' @return \item{vecB.estim}{vector with the path coefficients estimates}
+#' @return \item{Bestim}{matrix with path coefficients estimates}
+#' @return \item{vecWestim}{vector with the weight coefficients estimates}
+#' @return \item{vecBestim}{vector with the path coefficients estimates}
 #' @return \item{FIT,FIT_M,FIT_S,AFIT,GFI,SRMR}{??????????}
 #'
 #' @seealso \code{\link{????}}, \code{\link{???????}}, \code{\link{?????}}
@@ -57,7 +57,7 @@
 #' # take only a small piece for speed
 #' ge03d2.clean <- ge03d2.clean[1:200,]
 #'
-#' @author Hela, Stepan, .....
+#' @author Hela, Stepan, Aurelie.....
 #'
 #' @keywords GSCA
 
@@ -163,7 +163,24 @@ GSCAestim<-function(Z0,W0,B0,lambda_w = 0,lambda_b = 0){
   dif_s <- Gamma - Gamma%*%B
   Fit_m <- 1 - sum(diag(t(dif_m)%*%dif_m))/(J*N)
   Fit_s <- 1 - sum(diag(t(dif_s)%*%dif_s))/(P*N)
-  browser()
+    
+  #output values                      
+  NITER <- it
+  
+  FIT <- Fit;
+  FIT_M <- Fit_m
+  FIT_S <- Fit_s
+  AFIT <- Afit
+  #GFI = Gfi;
+  #SRMR = Srmr;
+  
+  Westim <- W
+  Bestim <- B
+  
+  vecWestim <- W[WIND]
+  vecBestim <- B[BIND]
+  
+  return(list("Westim" = Westim,"Bestim" = Bestim,"vecWestim" = vecWestim,"vecBestim" = vecBestim,"FIT" = FIT,"FIT_M" = FIT_M,"FIT_S" = FIT_S,"AFIT" = AFIT))
 }
 
 
