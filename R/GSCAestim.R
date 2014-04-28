@@ -21,8 +21,8 @@
 #' @param Z0 = N x J matrix of observed variables: Genotypes first then Phenotypes
 #' @param W0 = J x P matrix with 0's and 1's. W0[j,p]=1 indicates an arrow from the observed variable j to the latent variable p.
 #' @param B0 = P x P matrix with 0's and 1's. B0[p1,p2]=1 indicates an arrow from the latent variable p1 to the latent variable p2.
-#' @param lambda_w = ridge parameter for W   default 0
-#' @param lamdbda_b = ridge parameter for B  default 0
+#' @param lambda_w = ridge parameter for W default 0
+#' @param lamdbda_b = ridge parameter for B default 0
 #'
 #' @return \item{Westim}{matrix with weight coefficients estimates}
 #' @return \item{Bestim}{matrix with path coefficients estimates}
@@ -93,7 +93,9 @@ GSCAestim<-function(Z0,W0,B0,lambda_w = 0,lambda_b = 0){
   
   V <- cbind(diag(J), W)
   
-  Z <- scale(Z0)*sqrt(N)/sqrt(N-1) 
+  Z <- scale(Z0)*sqrt(N)/sqrt(N-1)
+  ZZ<-Z
+  
   if (rankMatrix(t(Z)%*%Z) == J){
     Z <- chol(t(Z)%*%Z)}
   sizeZ <- dim(Z)[1]
@@ -143,7 +145,7 @@ GSCAestim<-function(Z0,W0,B0,lambda_w = 0,lambda_b = 0){
           #browser()
           theta <- solve(as.numeric(beta%*%t(beta))*(t(Zp)%*%Zp) + lambda_w*diag(length(windex_p)))%*%(t(Zp)%*%(Z%*%Delta)%*%t(beta))
           zw <- Zp%*%theta        
-          theta <- sqrt(N)/norm(zw)*theta
+          theta <- sqrt(N)/sqrt(sum(zw^2))*theta
           W[windex_p, p] <- theta
           V[windex_p, t] <- theta
           tr_w <- tr_w + t(theta)%*%theta
@@ -163,7 +165,7 @@ GSCAestim<-function(Z0,W0,B0,lambda_w = 0,lambda_b = 0){
   dif_s <- Gamma - Gamma%*%B
   Fit_m <- 1 - sum(diag(t(dif_m)%*%dif_m))/(J*N)
   Fit_s <- 1 - sum(diag(t(dif_s)%*%dif_s))/(P*N)
-    
+  res <- modelfit_mg(ZZ, W, A, J, P, 1, matrix(c(1,N), nrow = 1))   
   #output values                      
   NITER <- it
   
@@ -179,7 +181,7 @@ GSCAestim<-function(Z0,W0,B0,lambda_w = 0,lambda_b = 0){
   
   vecWestim <- W[WIND]
   vecBestim <- B[BIND]
-  
+  browser()
   return(list("Westim" = Westim,"Bestim" = Bestim,"vecWestim" = vecWestim,"vecBestim" = vecBestim,"FIT" = FIT,"FIT_M" = FIT_M,"FIT_S" = FIT_S,"AFIT" = AFIT))
 }
 
